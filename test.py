@@ -13,11 +13,14 @@ class Client():
             thread = threading.Thread(target=task)
             thread.start()
     def cpuinfo(self):
-        cpuinfo = subprocess.check_output(["grep", "model name", "/proc/cpuinfo"])
-        print cpuinfo
-        #thread = threading.Timer(3, self.cpuinfo)
-        #thread.start()
-        return cpuinfo
+        cpuinfo = subprocess.check_output(["grep", "model name", "/proc/cpuinfo"]).split("\n")
+        cpuinfo.remove("")
+        print len(cpuinfo)
+        cpureport = "CPU Info:"
+        counter = 0
+        for cpu in cpuinfo:
+            cpureport += "CPU #"+str(counter)+": "+cpu+"\t"
+        print cpureport
     def meminfo(self):
         meminfo = subprocess.check_output(["grep", "Mem", "/proc/meminfo"])
         print meminfo
@@ -25,6 +28,6 @@ class Client():
 
 if __name__ == '__main__':
     myclient = Client()
-    myclient.run()
-    #myclient.cpuinfo()
+    #myclient.run()
+    myclient.cpuinfo()
     #myclient.meminfo()

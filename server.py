@@ -65,7 +65,7 @@ class Server():
                         #other socket, I'm going to ignore them for now
                         pass
             except KeyboardInterrupt:
-                print "Ctrl+C pressed. Leaving loop"
+                print "\nCtrl+C pressed. Leaving loop"
                 break
 
         while len(threading.enumerate()) > 1:

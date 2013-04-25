@@ -1,0 +1,6 @@
+Client-output*
+server_report*
+*.log
+*.db
+*.swp
+test.py

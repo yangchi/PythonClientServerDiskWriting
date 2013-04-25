@@ -30,9 +30,11 @@ class Client():
         self.identity = "[" + socket.gethostname() + \
                         "(" + socket.gethostbyname(socket.gethostname()) + "): " + \
                         str(self.sock.getsockname()[1]) + "]"
-        loginfo = time.ctime() + ": Client at " + self.identity + " starts."
+        loginfo = time.ctime() + ": Client at " + self.identity + \
+                                 " starts with configuration: chunk size = " + \
+                                 str(self.chunksize) + " file size = " + str(self.filesize)
         self.logging(loginfo)
-        self.sendserver(loginfo)
+        self.sock.send(loginfo)
         self.wrtfile = True
         self.allowend = False
         self.run()
@@ -61,7 +63,7 @@ class Client():
         print "Time up. Bye bye!"
         loginfo = time.ctime() + ": Client at " + self.identity + " stops."
         self.logging(loginfo)
-        self.sendserver(loginfo)
+        self.sock.send(loginfo)
         self.sock.close()
 
     def timestats(self):
@@ -85,7 +87,7 @@ class Client():
         meminfo.remove("")
         meminfo = [mem.replace('\t', ' ') for mem in meminfo if "RSS" in mem or "Size" in mem]
         memreport = "\tMEM Usage: " + "\t".join(meminfo)
-        self.sendserver("System info from " + self.identity + ":\n" + cpureport + "\n" + memreport)
+        self.sock.send("System info from " + self.identity + ":\n" + cpureport + "\n" + memreport)
         if time.time() + 10 < self.endtime:
             thread = threading.Timer(10, self.sysinfo)
             thread.start()
@@ -93,7 +95,7 @@ class Client():
     def heartbeat(self):
         '''Send out heartbeat every 5 secs
         '''
-        self.sendserver("Heartbeat from " + self.identity)
+        self.sock.send("Heartbeat from " + self.identity)
         if time.time() + 5 < self.endtime:
             thread = threading.Timer(5, self.heartbeat)
             thread.start()
@@ -115,15 +117,10 @@ class Client():
                 random_chunk = os.urandom(leftsize)
                 f.write(random_chunk)
             f.close()
-            loginfo = time.ctime() + ": file " + filename + " rollover!"
+            loginfo = time.ctime() + ": file " + filename + " rollover! at " + self.identity
             self.logging(loginfo)
-            self.sendserver(loginfo)
+            self.sock.send(loginfo)
         self.allowend = True
-
-    def sendserver(self, msg):
-        '''Send infomation to server
-        '''
-        self.sock.send(msg)
 
     def start_conn(self):
         ''' Connect to server

@@ -171,10 +171,19 @@ class Client():
         ''' Connect to server
         '''
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.serveraddr, self.serverport))
+        try:
+            self.sock.connect((self.serveraddr, self.serverport))
+        except Exception:
+            print >> sys.stderr, "Not able to connect to the server"
+            self.logging("Connection to " + self.serveraddr + ": " + str(self.serverport) + " fails.")
+            self.logging(time.ctime() + ": Client stops.")
+            sys.exit(1)
 
 
 if __name__ == '__main__':
     #myclient = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    if len(sys.argv) < 3:
+        print >> sys.stderr, "Please use 'client.py server server_port'"
+        sys.exit(1)
     for i in range(5):
         client = Client(random.randint(10, 25), random.randint(1000000, 2000000), random.randint(100, 9000), sys.argv[1], sys.argv[2])

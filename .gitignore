@@ -4,3 +4,4 @@ server_report*
 *.db
 *.swp
 test.py
+temp

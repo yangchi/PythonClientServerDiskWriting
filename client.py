@@ -6,6 +6,7 @@ import socket
 import sys
 import os
 import time
+import random
 
 
 class Client():
@@ -19,8 +20,13 @@ class Client():
             serverport --- server port
         '''
         (self.utime, self.stime, NULL, NULL, self.etime) = os.times()
+        if int(chunksize) < int(filesize) * 2:
+            print "Error!! \n Chunk size should be at least twice as large as file size. Quit"
+            sys.exit(1)
         self.chunksize = int(chunksize)
         self.filesize = int(filesize)
+        if not self.timelimit_checker(int(endtime)):
+            sys.exit(1)
         self.serveraddr = serveraddr
         self.serverport = int(serverport)
         self.starttime = time.time()
@@ -35,9 +41,27 @@ class Client():
                                  str(self.chunksize) + " file size = " + str(self.filesize)
         self.logging(loginfo)
         self.sock.send(loginfo)
-        self.wrtfile = True
+        #self.wrtfile = True
         self.allowend = False
         self.run()
+
+    def speedtest(self):
+        tempf = open("temp", "w")
+        data = os.urandom(1000 * 1000)
+        first = time.time()
+        tempf.write(data)
+        tempf.close()
+        second = time.time()
+        speed = 1000.0 * 1000.0 / (second - first) if second > first else float('inf')
+        return speed
+
+    def timelimit_checker(self, timelimit):
+        speed = self.speedtest()
+        if self.filesize * 2 > speed * timelimit:
+            print "Error!! \n The length of time configured is not enough for at least 2 file rollovers based on our estimated file io speed. Quit"
+            return False
+        else:
+            return True
 
     def logging(self, msg):
         self.logfile = open("client.log", "a")
@@ -53,11 +77,11 @@ class Client():
             thread.start()
         thread = threading.Timer(self.endtime - self.starttime, self.endclient)
         thread.start()
-        thread = threading.Thread(target=self.filewriter)
+        thread = threading.Thread(target=self.chunkwriter)
         thread.start()
 
     def endclient(self):
-        self.wrtfile = False
+        #self.wrtfile = False
         while not self.allowend:
             pass
         print "Time up. Bye bye!"
@@ -100,8 +124,29 @@ class Client():
             thread = threading.Timer(5, self.heartbeat)
             thread.start()
 
+    def chunkwriter(self):
+        '''In this one we assume chunks are larger than files
+        '''
+        the_chunk = os.urandom(self.chunksize)
+        pos = 0
+        counter = 0
+        while pos < self.chunksize:
+            counter += 1
+            filename = "Client-output-" + self.identity + "-" + time.ctime().replace(' ', '_').replace(':', '-') + "-" + str(counter)
+            f = open(filename, 'w')
+            endpos = pos + self.filesize if self.chunksize > pos + self.filesize else self.chunksize
+            f.write(the_chunk[pos:endpos])
+            f.close()
+            pos += self.filesize
+            loginfo = time.ctime() + ": file " + filename + " rollover! at " + self.identity
+            self.logging(loginfo)
+            self.sock.send(loginfo)
+        self.allowend = True
+
     def filewriter(self):
-        '''Write chunks to files
+        '''Write chunk to files.
+            Diff from self.chunkwriter, in this function we assume chunks are smaller than files.
+            Not going to use this one.
         '''
         counter = 0
         while self.wrtfile:
@@ -130,4 +175,6 @@ class Client():
 
 
 if __name__ == '__main__':
-    myclient = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    #myclient = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    for i in range(5):
+        client = Client(random.randint(10, 25), random.randint(1000000, 2000000), random.randint(100, 9000), sys.argv[1], sys.argv[2])

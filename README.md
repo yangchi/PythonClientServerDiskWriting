@@ -38,8 +38,18 @@ CPU from self-calculation. MEM info from /proc/{PID}/status.
 
 We assume the data chunk size is larger than file size.
 
+Initial speed test to decide if the provided time span is enough for files to roll over twice at least. *This however, won't be accurate.*
+
 ### Server:
 
 Using sqlite3 as DB.
 
 Handles Ctrl+C.
+
+Using a seperate thread to handle each client.
+
+## Note:
+
+It would be interesting to implement this with twisted. We could also use SocketServer.
+
+The CPU and MEM usage we got here is of the process, not the thread. This is not accurate. But given that the other 2 threads in the client do not eat much CPU or MEM, the current solution isn't too bad after all. Thread profiling may take a little longer time to implement.

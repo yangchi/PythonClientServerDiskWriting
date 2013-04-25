@@ -183,7 +183,7 @@ class Client():
 if __name__ == '__main__':
     #myclient = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     if len(sys.argv) < 3:
-        print >> sys.stderr, "Please use 'client.py server server_port'"
+        print >> sys.stderr, "Please use 'client.py server server-port'"
         sys.exit(1)
     for i in range(5):
         client = Client(random.randint(10, 25), random.randint(1000000, 2000000), random.randint(100, 9000), sys.argv[1], sys.argv[2])

@@ -56,7 +56,7 @@ Using a seperate thread to handle each client.
 
 ### Server:
 
-./server.py
+./server.py *server-port*
 
 ## Note:
 

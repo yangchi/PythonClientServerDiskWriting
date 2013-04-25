@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import select
 import threading
 import socket
@@ -12,7 +13,7 @@ import os.path
 class Server():
     def __init__(self, addr, port):
         self.addr = addr
-        self.port = port
+        self.port = int(port)
         self.lock = threading.Lock()
         self.report_f = open("server_report-" + time.ctime().replace(' ', '_') + ".out", "w")
         self.report_f.write("Server starts at: " + time.ctime() + "\n")
@@ -144,4 +145,7 @@ class Server():
         self.logging("Connection to " + str(addr) + " closed.")
 
 if __name__ == '__main__':
-    myserver = Server(socket.gethostname(), 1234)
+    if len(sys.argv) < 2:
+        print >> sys.stderr, "Please use 'server.py server-port'"
+        sys.exit(1)
+    myserver = Server(socket.gethostname(), sys.argv[1])

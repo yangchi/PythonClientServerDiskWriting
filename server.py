@@ -43,6 +43,7 @@ class Server():
         print "============= Server Info Begin ============="
         loginfo = "listening at [" + self.addr + "(" + socket.gethostbyname(self.addr) + "): " + str(self.port) + "]"
         self.logging(loginfo)
+        self.report_f.write(loginfo)
         print loginfo
         print "============= Server Info End ==============="
         while True:
@@ -87,6 +88,7 @@ class Server():
             self.report_f.write("\t Average virtual memory resident set size: " +
                                 str(float(sum(self.vmrss_stats[client])) / len(self.vmrss_stats[client]) if len(self.vmrss_stats[client]) > 0 else float('nan')) +
                                 "\n")
+        self.report_f.write(time.ctime() + ": Server stops")
         self.report_f.close()
 
     def client_stats(self, (host, port, cpu, vmsize, vmrss)):

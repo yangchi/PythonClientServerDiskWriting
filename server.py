@@ -75,6 +75,8 @@ class Server():
         print "Nice serving all the clients. Bye bye."
 
     def report(self):
+        '''Generate a report upon exiting the server
+        '''
         self.report_f.write("Total number of served clients: " + str(len(self.clients)) + "\n")
         for client in self.clients:
             self.report_f.write("======================================\n" +
@@ -92,6 +94,8 @@ class Server():
         self.report_f.close()
 
     def client_stats(self, (host, port, cpu, vmsize, vmrss)):
+        ''' Calculate some stats of clients' perf info
+        '''
         client = host + ":" + port
         self.clients.add(client)
         if client in self.cpustats:
@@ -108,6 +112,8 @@ class Server():
             self.vmrss_stats[client] = [float(vmrss)]
 
     def extract_perf(self, msg):
+        '''Extract client's perf info from its mesg
+        '''
         msg = msg.replace('\n', '')
         pattern = "^System info from.*\[(?P<Host>.*):\s+(?P<port>\d+)\]:.*\s+CPU Usage:\s+(?P<cpu>\d+\.\d*).*VmSize:\s+(?P<VmSize>\d+).*VmRSS:\s+(?P<VmRSS>\d+).*"
         regex = re.compile(pattern)

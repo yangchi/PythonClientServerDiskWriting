@@ -48,6 +48,16 @@ Handles Ctrl+C.
 
 Using a seperate thread to handle each client.
 
+## Run:
+
+### Client:
+
+./client *server* *server-port*
+
+### Server:
+
+./server.py
+
 ## Note:
 
 It would be interesting to implement this with twisted. We could also use SocketServer.

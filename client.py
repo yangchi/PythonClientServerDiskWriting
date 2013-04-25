@@ -20,9 +20,9 @@ class Client():
             serverport --- server port
         '''
         (self.utime, self.stime, NULL, NULL, self.etime) = os.times()
-        if int(chunksize) < int(filesize) * 2:
-            print "Error!! \n Chunk size should be at least twice as large as file size. Quit"
-            sys.exit(1)
+        #if int(chunksize) < int(filesize) * 2:
+        #    print "Error!! \n Chunk size should be at least twice as large as file size. Quit"
+        #    sys.exit(1)
         self.chunksize = int(chunksize)
         self.filesize = int(filesize)
         if not self.timelimit_checker(int(endtime)):
@@ -41,7 +41,7 @@ class Client():
                                  str(self.chunksize) + " file size = " + str(self.filesize)
         self.logging(loginfo)
         self.sock.send(loginfo)
-        #self.wrtfile = True
+        self.wrtfile = True
         self.allowend = False
         self.run()
 
@@ -53,6 +53,7 @@ class Client():
         tempf.close()
         second = time.time()
         speed = 1000.0 * 1000.0 / (second - first) if second > first else float('inf')
+        os.remove("temp")
         return speed
 
     def timelimit_checker(self, timelimit):
@@ -77,11 +78,11 @@ class Client():
             thread.start()
         thread = threading.Timer(self.endtime - self.starttime, self.endclient)
         thread.start()
-        thread = threading.Thread(target=self.chunkwriter)
+        thread = threading.Thread(target=self.filewriter)
         thread.start()
 
     def endclient(self):
-        #self.wrtfile = False
+        self.wrtfile = False
         while not self.allowend:
             pass
         print "Time up. Bye bye!"
@@ -126,6 +127,7 @@ class Client():
 
     def chunkwriter(self):
         '''In this one we assume chunks are larger than files
+            this assumption was wrong.
         '''
         the_chunk = os.urandom(self.chunksize)
         pos = 0
@@ -146,7 +148,6 @@ class Client():
     def filewriter(self):
         '''Write chunk to files.
             Diff from self.chunkwriter, in this function we assume chunks are smaller than files.
-            Not going to use this one.
         '''
         counter = 0
         while self.wrtfile:
@@ -186,4 +187,4 @@ if __name__ == '__main__':
         print >> sys.stderr, "Please use 'client.py server server-port'"
         sys.exit(1)
     for i in range(5):
-        client = Client(random.randint(10, 25), random.randint(1000000, 2000000), random.randint(100, 9000), sys.argv[1], sys.argv[2])
+        client = Client(random.randint(10, 25), random.randint(1000, 9000), random.randint(1000000, 2000000), sys.argv[1], sys.argv[2])

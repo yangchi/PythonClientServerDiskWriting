@@ -36,7 +36,7 @@ Using threading module.
 
 CPU from self-calculation. MEM info from /proc/{PID}/status.
 
-We assume the data chunk size is larger than file size.
+We assume the data chunk size is smaller than file size.
 
 Initial speed test to decide if the provided time span is enough for files to roll over twice at least. *This however, won't be accurate.*
 
